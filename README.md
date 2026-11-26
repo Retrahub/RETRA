@@ -2,6 +2,10 @@
 
 **Trade it. Tail it. Prove it.**
 
+🌐 **Website:** https://retrahub.github.io/RETRA/
+
+Website di-host gratis lewat GitHub Pages dari branch `main`. Setiap push ke `main` otomatis meng-update website dalam 1–2 menit.
+
 Landing page RETRA: satu aplikasi on-chain di Robinhood Chain yang menggabungkan tiga modul:
 
 | Modul | Isi |
