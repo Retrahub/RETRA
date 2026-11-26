@@ -14,6 +14,27 @@ Landing page RETRA: satu aplikasi on-chain di Robinhood Chain yang menggabungkan
 | **Callouts** | Posisi LP dijadikan postingan yang bisa di-*tail* dalam satu klik, lengkap dengan badge anti-shill |
 | **Proof** | Bounty USDG untuk menjalankan ulang riset di GPU teratestasi, dengan verdict per klaim |
 
+## Aplikasi MVP (Callouts Lite)
+
+🧪 **App:** https://retrahub.github.io/RETRA/app/
+
+Minggu 1 (hanya baca, tidak pernah mengirim transaksi):
+
+- **Masuk dengan wallet**: connect (MetaMask, Rabby, dll.), lalu satu tanda tangan pesan (EIP-191, format mirip Sign-In with Ethereum). Tanpa gas.
+- **Pindah jaringan**: tombol untuk pindah ke atau menambahkan Robinhood Chain di wallet.
+- **Posisi LP**: membaca posisi Uniswap v4 milik wallet (atau alamat apa pun lewat `?address=0x...`) langsung dari Robinhood Chain: pair, range harga, harga sekarang, status in-range, fee, hook.
+
+Sumber data (semua gratis):
+
+| Data | Sumber |
+|---|---|
+| Daftar NFT posisi milik alamat | Blockscout API `robinhoodchain.blockscout.com` |
+| Isi posisi (pool, tick, liquidity) | Uniswap v4 PositionManager `0x58da…4fa7` lewat Multicall3 |
+| Harga pool sekarang | Uniswap v4 StateView `0xf333…673b` |
+| RPC | `rpc.mainnet.chain.robinhood.com` (publik, ada rate limit) |
+
+Alamat kontrak dan pengaturan chain ada di `app/chain.js`.
+
 ## Struktur
 
 ```
@@ -24,6 +45,10 @@ i18n.js          terjemahan Bahasa Indonesia (tombol EN / ID di navbar)
 script.js        interaksi: jam sesi New York, grafik bins, kartu callout, terminal, verdict, ganti bahasa
 serve.js         server statis kecil untuk preview lokal
 assets/logo.svg  logo dan favicon
+app/index.html   aplikasi MVP: login wallet + posisi LP
+app/app.js       logika app (viem dari CDN, tanpa build step)
+app/app.css      style khusus app
+app/chain.js     Robinhood Chain + alamat kontrak Uniswap v4
 ```
 
 Tidak ada build step dan tidak ada dependency.
@@ -60,4 +85,4 @@ Lalu buka http://localhost:5173
 
 ## Yang masih placeholder
 
-Semua nilai di `config.js` masih kosong: contract address `$RETRA` (tampil "TBA") dan semua link.
+Di `config.js`, contract address `$RETRA` (tampil "TBA") dan link Docs, X, GitHub, explorer masih kosong. Tombol **Launch app** sudah mengarah ke `app/`.

@@ -8,7 +8,7 @@ window.RETRA_CONFIG = {
   contractAddress: "",
 
   links: {
-    app: "",      // tombol "Launch app"
+    app: "app/",  // tombol "Launch app" (aplikasi MVP di folder app/)
     docs: "",     // tombol "Docs" / "Read the docs"
     x: "",        // akun X / Twitter, contoh: "https://x.com/retra"
     github: "",   // repo publik (repo Retrahub/RETRA masih private)
