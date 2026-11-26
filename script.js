@@ -7,6 +7,25 @@
   const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  /* ---------- settings (config.js) + language state (i18n.js) ---------- */
+  const CFG = window.RETRA_CONFIG || {};
+  const I18N = window.RETRA_I18N || {};
+  const UI_EN = {
+    baseFee: "base fee",
+    caMissing: "Contract address not announced yet",
+    caCopied: "Contract address copied",
+    prefilled: "Prefilled ✓",
+    tailToast: "Demo: range prefilled — review the size and sign in the app",
+    tba: "To be announced",
+  };
+  let lang = "en";
+  const langHooks = [];
+  const onLang = (fn) => langHooks.push(fn);
+  const ui = (k) => (lang === "id" && I18N.ui && I18N.ui[k]) || UI_EN[k];
+  // English data object, with the Indonesian fields laid over it when ID is active
+  const localize = (group, key, base) =>
+    lang === "id" && I18N[group] && I18N[group][key] ? { ...base, ...I18N[group][key] } : base;
+
   const css = getComputedStyle(document.documentElement);
   const C = {
     text: css.getPropertyValue("--text").trim() || "#f1eee8",
@@ -41,17 +60,34 @@
     })
   );
 
-  /* ---------- contract address chip ---------- */
-  $("#copyCa").addEventListener("click", async (e) => {
-    const ca = e.currentTarget.dataset.ca || "";
-    if (/^0x0+$/.test(ca)) return toast("Contract address not announced yet");
-    try {
-      await navigator.clipboard.writeText(ca);
-      toast("Contract address copied");
-    } catch {
-      toast(ca);
+  /* ---------- links + contract address (from config.js) ---------- */
+  const links = CFG.links || {};
+  $$("[data-link]").forEach((a) => {
+    const url = String(links[a.dataset.link] || "").trim();
+    if (!url) return; // keep the on-page anchor as a placeholder
+    a.href = url;
+    if (/^https?:\/\//i.test(url)) {
+      a.target = "_blank";
+      a.rel = "noopener";
     }
   });
+
+  const ca = String(CFG.contractAddress || "").trim();
+  $("#caText").textContent = ca ? `${ca.slice(0, 6)}…${ca.slice(-4)}` : "TBA";
+  onLang(() => {
+    $("#tokenCa").textContent = ca || ui("tba");
+  });
+
+  $$("[data-copy-ca]").forEach((btn) =>
+    btn.addEventListener("click", () => {
+      if (!ca) return toast(ui("caMissing"));
+      if (!navigator.clipboard) return toast(ca);
+      navigator.clipboard.writeText(ca).then(
+        () => toast(ui("caCopied")),
+        () => toast(ca)
+      );
+    })
+  );
 
   $("#year").textContent = new Date().getFullYear();
 
@@ -148,9 +184,11 @@
   const fmtFee = (f) => f.toFixed(2) + "%";
   const sessionBtns = $$(".session");
   let liveSession = null;
+  let selectedSession = null;
 
   function showSession(key) {
-    const s = SESSIONS[key];
+    selectedSession = key;
+    const s = localize("sessions", key, SESSIONS[key]);
     sessionBtns.forEach((b) => {
       const on = b.dataset.session === key;
       b.classList.toggle("is-active", on);
@@ -168,10 +206,10 @@
   function tickClock() {
     const n = nyNow();
     const key = sessionAt(n);
-    const s = SESSIONS[key];
+    const s = localize("sessions", key, SESSIONS[key]);
     $("#nyClock").textContent = `${String(n.hh).padStart(2, "0")}:${String(n.mm).padStart(2, "0")} ET`;
     $("#heroSession").textContent = s.name;
-    $("#heroFee").textContent = "base fee " + fmtFee(s.fee);
+    $("#heroFee").textContent = ui("baseFee") + " " + fmtFee(s.fee);
     $("#timelineNow").style.left = (n.t / 24) * 100 + "%";
     if (key !== liveSession) {
       sessionBtns.forEach((b) => b.classList.toggle("is-now", b.dataset.session === key));
@@ -181,6 +219,10 @@
   }
   tickClock();
   setInterval(tickClock, 20000);
+  onLang(() => {
+    tickClock();
+    if (selectedSession) showSession(selectedSession);
+  });
 
   /* =========================================================
      Canvas helpers
@@ -411,6 +453,8 @@
       exact: "Prefills the caller's 14 bins. You choose the size and sign.",
       shape: "Same 14-bin curve, re-anchored just under the active bin. You choose the size and sign.",
     };
+    let tailMode = "exact";
+    const noteFor = (mode) => (lang === "id" && I18N.tail && I18N.tail[mode]) || notes[mode];
     $$(".seg-toggle button").forEach((btn) =>
       btn.addEventListener("click", () => {
         $$(".seg-toggle button").forEach((b) => {
@@ -418,17 +462,20 @@
           b.classList.toggle("is-active", on);
           b.setAttribute("aria-selected", String(on));
         });
-        const mode = btn.dataset.tail;
-        target = mode === "shape" ? shapeStart : exactStart;
-        $("#tailNote").textContent = notes[mode];
+        tailMode = btn.dataset.tail;
+        target = tailMode === "shape" ? shapeStart : exactStart;
+        $("#tailNote").textContent = noteFor(tailMode);
         requestAnimationFrame(draw);
       })
     );
+    onLang(() => {
+      $("#tailNote").textContent = noteFor(tailMode);
+    });
 
     const tailBtn = $("#tailBtn");
     tailBtn.addEventListener("click", () => {
-      tailBtn.textContent = "Prefilled ✓";
-      toast("Demo: range prefilled — review the size and sign in the app");
+      tailBtn.textContent = ui("prefilled");
+      toast(ui("tailToast"));
       setTimeout(() => (tailBtn.textContent = "Tail"), 2200);
     });
 
@@ -493,6 +540,18 @@
       failed: { claim: "table_4.rmsd", paper: "1.21 Å", rerun: "2.87 Å", tol: "± 0.15 Å", nodes: "2 of 2 agree", note: "Not reproduced with the published code and data.", color: "#ff5d73" },
       norun: { claim: "supp_s2.heldout", paper: "0.88", rerun: "—", tol: "± 0.01", nodes: "n/a", note: "Held-out set is not public. The bounty still pays, and authors can reply.", color: C.dim },
     };
+    let current = "replicated";
+    function render() {
+      const d = localize("verdicts", current, data[current]);
+      $("#vClaim").textContent = d.claim;
+      $("#vPaper").textContent = d.paper;
+      $("#vRerun").textContent = d.rerun;
+      $("#vTol").textContent = d.tol;
+      $("#vNodes").textContent = d.nodes;
+      const note = $("#vNote");
+      note.textContent = d.note;
+      note.style.color = d.color;
+    }
     const btns = $$(".verdict");
     btns.forEach((b) =>
       b.addEventListener("click", () => {
@@ -501,16 +560,63 @@
           x.classList.toggle("is-active", on);
           x.setAttribute("aria-selected", String(on));
         });
-        const d = data[b.dataset.v];
-        $("#vClaim").textContent = d.claim;
-        $("#vPaper").textContent = d.paper;
-        $("#vRerun").textContent = d.rerun;
-        $("#vTol").textContent = d.tol;
-        $("#vNodes").textContent = d.nodes;
-        const note = $("#vNote");
-        note.textContent = d.note;
-        note.style.color = d.color;
+        current = b.dataset.v;
+        render();
       })
     );
+    onLang(render);
+  })();
+
+  /* =========================================================
+     Language (EN / ID)
+     Swaps every static text node that has an entry in RETRA_I18N.text,
+     then lets each module redraw the text it writes at runtime.
+     ========================================================= */
+  (function language() {
+    const dict = I18N.text || {};
+    const norm = (s) => s.replace(/\s+/g, " ").trim();
+    const nodes = [];
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+      if (n.parentElement && n.parentElement.closest("script, style, pre")) continue;
+      const key = norm(n.nodeValue);
+      if (!key || !dict[key]) continue;
+      const v = n.nodeValue;
+      nodes.push({ n, en: v, id: v.match(/^\s*/)[0] + dict[key] + v.match(/\s*$/)[0] });
+    }
+
+    const buttons = $$(".lang button");
+    function setLang(next) {
+      lang = next === "id" ? "id" : "en";
+      document.documentElement.lang = lang;
+      nodes.forEach((o) => {
+        o.n.nodeValue = o[lang];
+      });
+      buttons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
+      langHooks.forEach((fn) => fn());
+    }
+
+    buttons.forEach((b) =>
+      b.addEventListener("click", () => {
+        setLang(b.dataset.lang);
+        try {
+          localStorage.setItem("retra-lang", lang);
+        } catch (e) {
+          /* storage unavailable: the choice just isn't remembered */
+        }
+      })
+    );
+
+    let initial = null;
+    try {
+      initial = localStorage.getItem("retra-lang");
+    } catch (e) {
+      initial = null;
+    }
+    if (initial !== "en" && initial !== "id") {
+      const pref = CFG.defaultLanguage || "auto";
+      initial = pref === "auto" ? (/^id\b/i.test(navigator.language || "") ? "id" : "en") : pref;
+    }
+    setLang(initial);
   })();
 })();

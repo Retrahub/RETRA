@@ -29,8 +29,12 @@
         <a href="#token">Token</a>
       </nav>
       <div class="nav__cta">
-        <a href="#docs" class="btn btn--ghost btn--sm hide-sm">Docs</a>
-        <a href="#launch" class="btn btn--primary btn--sm">Launch app</a>
+        <div class="lang" role="group" aria-label="Language">
+          <button type="button" data-lang="en" aria-pressed="true">EN</button>
+          <button type="button" data-lang="id" aria-pressed="false">ID</button>
+        </div>
+        <a href="#docs" data-link="docs" class="btn btn--ghost btn--sm hide-sm">Docs</a>
+        <a href="#launch" data-link="app" class="btn btn--primary btn--sm hide-xs">Launch app</a>
         <button class="nav__toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
           <span></span><span></span>
         </button>
@@ -46,9 +50,9 @@
         <div class="hero__copy">
           <div class="chips">
             <span class="chip"><i class="pulse"></i>Robinhood Chain · Mainnet</span>
-            <button class="chip chip--btn" id="copyCa" data-ca="0x0000000000000000000000000000000000000000" title="Copy contract address">
+            <button type="button" class="chip chip--btn" id="copyCa" data-copy-ca title="Copy contract address">
               <span class="mono">CA</span>
-              <span class="mono" id="caText">0x0000…0000 · TBA</span>
+              <span class="mono" id="caText">TBA</span>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
             </button>
           </div>
@@ -67,7 +71,7 @@
           </p>
 
           <div class="hero__actions">
-            <a href="#launch" class="btn btn--primary">Launch app
+            <a href="#launch" data-link="app" class="btn btn--primary">Launch app
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
             </a>
             <a href="#modules" class="btn btn--ghost">Explore the modules</a>
@@ -525,10 +529,10 @@
             <p class="eyebrow">Token</p>
             <h2>$RETRA</h2>
             <p class="section__sub">One token across all three modules. Holding unlocks tiers — nothing is printed.</p>
-            <div class="token__ca">
+            <button type="button" class="token__ca" data-copy-ca title="Copy contract address">
               <span class="mono muted">Contract · Robinhood Chain</span>
-              <span class="mono">To be announced</span>
-            </div>
+              <span class="mono token__ca-value" id="tokenCa">To be announced</span>
+            </button>
           </div>
           <div class="token__grid">
             <div class="tcard"><strong>Fair launch</strong><p>Fixed supply, no presale, no owner functions.</p></div>
@@ -540,14 +544,51 @@
       </div>
     </section>
 
+    <!-- ============ FAQ ============ -->
+    <section class="section" id="faq">
+      <div class="wrap faq-wrap">
+        <header class="section__head reveal">
+          <p class="eyebrow">FAQ</p>
+          <h2>Questions, <em>answered.</em></h2>
+          <p class="section__sub">The short version of what RETRA is and how it treats your funds.</p>
+        </header>
+        <div class="faq reveal">
+          <details open>
+            <summary>What is RETRA?</summary>
+            <p>One app on Robinhood Chain with three modules: Markets for stock-token pools, Callouts for sharing and copying LP positions, and Proof for paying to re-run research. You sign in once and use all three.</p>
+          </details>
+          <details>
+            <summary>Do I need the $RETRA token to use it?</summary>
+            <p>No. Trading, tailing and reading certificates work with any wallet. Holding $RETRA only unlocks tiers such as lower bounty fees.</p>
+          </details>
+          <details>
+            <summary>Does tailing a callout copy the caller's profit?</summary>
+            <p>No. Tailing copies a range, not a result. You choose the size, review the transaction and sign it yourself, and LP positions can lose value.</p>
+          </details>
+          <details>
+            <summary>Why do Markets fees change during the day?</summary>
+            <p>Liquidity is thinner outside regular exchange hours, so fees rise and flow limits tighten to protect LPs. Regular hours are the cheapest at 0.05%.</p>
+          </details>
+          <details>
+            <summary>What happens if a paper fails replication?</summary>
+            <p>The certificate shows the paper's value next to the re-run value and marks the claim Failed. It means the result was not reproduced with the published code and data, not that anyone cheated. The bounty pays the same either way.</p>
+          </details>
+          <details>
+            <summary>Can RETRA move my funds or post on my X account?</summary>
+            <p>No. There is no admin key that moves user funds, every approval is for the exact amount, and X access is read-only.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
     <!-- ============ CTA ============ -->
     <section class="cta" id="launch">
       <div class="wrap cta__inner reveal">
         <h2>Trade it. Tail it. <em>Prove it.</em></h2>
         <p>Browse with a wallet. Posting, liking and funding bounties need a quick sign-in.</p>
         <div class="hero__actions hero__actions--center">
-          <a href="#launch" class="btn btn--primary">Launch app</a>
-          <a href="#docs" class="btn btn--ghost">Read the docs</a>
+          <a href="#launch" data-link="app" class="btn btn--primary">Launch app</a>
+          <a href="#docs" data-link="docs" class="btn btn--ghost">Read the docs</a>
         </div>
         <p class="fine">LP positions can lose value. Tailing copies a range, not a result. Nothing on this site is financial advice.</p>
       </div>
@@ -562,8 +603,8 @@
         <p class="muted">Trade it. Tail it. Prove it.<br />Built on Robinhood Chain.</p>
       </div>
       <div><h4>Modules</h4><a href="#markets">Markets</a><a href="#callouts">Callouts</a><a href="#proof">Proof</a></div>
-      <div><h4>Developers</h4><a href="#docs">Docs</a><a href="#docs">Contracts</a><a href="#docs">API &amp; MCP</a><a href="#docs">GitHub</a></div>
-      <div><h4>Project</h4><a href="#token">$RETRA</a><a href="#safety">Safety</a><a href="#status">Status</a><a href="#docs">Brand</a></div>
+      <div><h4>Developers</h4><a href="#docs" data-link="docs">Docs</a><a href="#token" data-link="explorer">Contracts</a><a href="#docs" data-link="docs">API &amp; MCP</a><a href="#docs" data-link="github">GitHub</a></div>
+      <div><h4>Project</h4><a href="#token">$RETRA</a><a href="#safety">Safety</a><a href="#status">Status</a><a href="#faq">FAQ</a><a href="#docs" data-link="x">X / Twitter</a></div>
     </div>
     <div class="wrap footer__bottom mono">
       <span>© <span id="year">2026</span> RETRA</span>
@@ -572,6 +613,8 @@
   </footer>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="config.js"></script>
+  <script src="i18n.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
