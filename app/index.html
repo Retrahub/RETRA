@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>RETRA App · Positions</title>
-  <meta name="description" content="Sign in with your wallet and see your Uniswap v4 LP positions on Robinhood Chain." />
+  <title>RETRA App · Callouts</title>
+  <meta name="description" content="Post your Uniswap v4 LP positions on Robinhood Chain as callouts, and follow what other LPs are doing." />
   <meta name="theme-color" content="#09090B" />
   <link rel="icon" href="../assets/logo.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -33,9 +33,9 @@
 
   <main class="wrap app-main">
     <section class="app-head">
-      <p class="eyebrow eyebrow--callouts" data-i18n="eyebrow">Week 1 preview · read only</p>
-      <h1 data-i18n="title">Your LP positions</h1>
-      <p class="muted" data-i18n="lead">Connect a wallet to sign in, or paste any address. RETRA reads Uniswap v4 positions straight from Robinhood Chain. Nothing on this page sends a transaction.</p>
+      <p class="eyebrow eyebrow--callouts" data-i18n="eyebrow">Week 2 preview</p>
+      <h1 data-i18n="title">Every LP position is a post</h1>
+      <p class="muted" data-i18n="lead">Sign in with your wallet, pick one of your open Uniswap v4 positions on Robinhood Chain and post it as a callout. Every card is checked against the chain.</p>
     </section>
 
     <section class="panel account" aria-labelledby="accountTitle">
@@ -66,37 +66,81 @@
       <p class="account__msg" id="accountMsg" role="status" aria-live="polite"></p>
     </section>
 
-    <form class="lookup" id="lookup" novalidate>
-      <label for="lookupInput" class="mono muted" data-i18n="lookupLabel">Or view any address</label>
-      <div class="lookup__row">
-        <input id="lookupInput" class="input mono" type="text" placeholder="0x…" autocomplete="off" spellcheck="false" />
-        <button type="submit" class="btn btn--ghost" data-i18n="lookupBtn">View positions</button>
-      </div>
-      <p class="lookup__err" id="lookupErr" role="alert"></p>
-    </form>
+    <nav class="tabs" role="tablist" aria-label="Views">
+      <a href="#feed" role="tab" class="tab" id="tabFeed" data-view="feed" data-i18n="tabFeed">Feed</a>
+      <a href="#positions" role="tab" class="tab" id="tabPositions" data-view="positions" data-i18n="tabPositions">My positions</a>
+    </nav>
 
-    <section class="positions" aria-labelledby="posTitle">
+    <!-- FEED -->
+    <section class="view" id="viewFeed" role="tabpanel" aria-labelledby="tabFeed">
       <header class="positions__head">
         <div>
-          <h2 id="posTitle" data-i18n="posTitle">Positions</h2>
-          <p class="mono muted" id="posOwner"></p>
+          <h2 data-i18n="feedTitle">Latest callouts</h2>
+          <p class="muted feed__sub" data-i18n="feedSub">Every callout is tied to a real position. Status and price update live from the chain.</p>
         </div>
-        <dl class="stats" id="stats"></dl>
+        <button type="button" class="btn btn--ghost btn--sm" id="feedRefresh" data-i18n="refresh">Refresh</button>
       </header>
-      <label class="check" id="closedToggle" hidden>
-        <input type="checkbox" id="showClosed" />
-        <span data-i18n="showClosed">Show closed positions</span>
-        <span class="mono" id="closedCount"></span>
-      </label>
-      <div class="grid" id="posGrid" aria-live="polite"></div>
-      <div class="empty" id="posEmpty"></div>
+      <div class="feed" id="feedList" aria-live="polite"></div>
+      <div class="empty" id="feedEmpty" hidden></div>
+      <button type="button" class="btn btn--ghost feed__more" id="feedMore" data-i18n="loadMore" hidden>Load more</button>
+    </section>
+
+    <!-- POSITIONS -->
+    <section class="view" id="viewPositions" role="tabpanel" aria-labelledby="tabPositions" hidden>
+      <form class="lookup" id="lookup" novalidate>
+        <label for="lookupInput" class="mono muted" data-i18n="lookupLabel">Or view any address</label>
+        <div class="lookup__row">
+          <input id="lookupInput" class="input mono" type="text" placeholder="0x…" autocomplete="off" spellcheck="false" />
+          <button type="submit" class="btn btn--ghost" data-i18n="lookupBtn">View positions</button>
+        </div>
+        <p class="lookup__err" id="lookupErr" role="alert"></p>
+      </form>
+
+      <div class="positions">
+        <header class="positions__head">
+          <div>
+            <h2 id="posTitle" data-i18n="posTitle">Positions</h2>
+            <p class="mono muted" id="posOwner"></p>
+          </div>
+          <dl class="stats" id="stats"></dl>
+        </header>
+        <label class="check" id="closedToggle" hidden>
+          <input type="checkbox" id="showClosed" />
+          <span data-i18n="showClosed">Show closed positions</span>
+          <span class="mono" id="closedCount"></span>
+        </label>
+        <div class="grid" id="posGrid" aria-live="polite"></div>
+        <div class="empty" id="posEmpty"></div>
+      </div>
     </section>
   </main>
+
+  <!-- COMPOSER -->
+  <dialog class="composer" id="composer" aria-labelledby="composeTitle">
+    <form method="dialog" id="composeForm" novalidate>
+      <header class="composer__head">
+        <h2 id="composeTitle" data-i18n="composeTitle">Post a callout</h2>
+        <button type="button" class="composer__x" id="composeClose" aria-label="Close">×</button>
+      </header>
+      <div class="composer__pos" id="composePos"></div>
+      <label for="composeText" class="mono muted" data-i18n="composeLabel">Your play</label>
+      <textarea id="composeText" class="input composer__text" rows="4" maxlength="400"></textarea>
+      <div class="composer__meta">
+        <span class="muted" data-i18n="composeHint">Links and wallet or contract addresses are blocked to keep readers safe from phishing.</span>
+        <span class="mono" id="composeCount">280</span>
+      </div>
+      <p class="composer__err" id="composeErr" role="alert"></p>
+      <footer class="composer__foot">
+        <button type="button" class="btn btn--ghost" id="composeCancel" data-i18n="cancel">Cancel</button>
+        <button type="submit" class="btn btn--callouts" id="composeSubmit" data-i18n="postBtn">Post</button>
+      </footer>
+    </form>
+  </dialog>
 
   <footer class="app-footer">
     <div class="wrap app-footer__inner">
       <a href="../" data-i18n="back">← Back to the RETRA home page</a>
-      <p data-i18n="footer">Data is read live from Robinhood Chain (public RPC), Blockscout and Uniswap v4. LP positions can lose value. Nothing here is financial advice.</p>
+      <p data-i18n="footer">Data is read live from Robinhood Chain (public RPC), Blockscout and Uniswap v4. LP positions can lose value. Tailing copies a range, not a result. Nothing here is financial advice.</p>
     </div>
   </footer>
 

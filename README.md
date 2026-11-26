@@ -35,6 +35,37 @@ Sumber data (semua gratis):
 
 Alamat kontrak dan pengaturan chain ada di `app/chain.js`.
 
+Minggu 2:
+
+- **Login diverifikasi server**: app meminta nonce sekali pakai dari API, wallet menandatangani pesan, server memeriksa tanda tangan, lalu memberi token sesi 24 jam.
+- **Posting callout**: di tab *Posisi saya*, posisi yang masih terbuka punya tombol **Posting callout** (maks. 280 karakter). Server mengecek di chain bahwa wallet itu pemilik posisinya dan posisinya masih berisi likuiditas. Link dan alamat 0x diblokir (anti-phishing), maksimal 10 callout per jam, satu callout per posisi.
+- **Feed**: callout terbaru, dengan status dan harga yang dibaca langsung dari chain (saat posting → sekarang).
+
+## API (Cloudflare Worker + D1)
+
+Kode ada di `api/`. Endpoint: `POST /auth/nonce`, `POST /auth/verify`, `POST /auth/logout`, `GET /me`, `GET /callouts`, `POST /callouts`.
+
+Menjalankan di komputer:
+
+```bash
+cd api
+npm install
+npm run db:local      # buat tabel di database lokal
+npm run dev           # API di http://127.0.0.1:8787
+```
+
+Untuk tes lokal, file `api/.dev.vars` boleh berisi `DEV_ALLOW_ANY_OWNER="true"` supaya posting tidak mengecek pemilik posisi. Ini **hanya berlaku di localhost**, dan file itu tidak ikut ke Git maupun ke server.
+
+Deploy (sekali, butuh akun Cloudflare gratis):
+
+```bash
+cd api
+npx wrangler login
+npx wrangler d1 create retra        # salin database_id ke wrangler.toml
+npm run db:remote
+npm run deploy                      # lalu isi API_URL di app/chain.js dengan URL workers.dev
+```
+
 ## Struktur
 
 ```

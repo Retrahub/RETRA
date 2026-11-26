@@ -1,0 +1,14 @@
+name = "retra-api"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+
+[vars]
+# Sites allowed to call the API (CORS) and to appear as the sign-in domain.
+ALLOWED_ORIGINS = "https://retrahub.github.io,http://localhost:5173"
+RPC_URL = "https://rpc.mainnet.chain.robinhood.com"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "retra"
+# Replaced with the real id after `npx wrangler d1 create retra`.
+database_id = "00000000-0000-0000-0000-000000000000"

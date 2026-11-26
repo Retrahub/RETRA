@@ -21,5 +21,9 @@ export const CONTRACTS = {
 // Blockscout lists which position NFTs an address holds (the PositionManager is not enumerable on-chain).
 export const BLOCKSCOUT_API = "https://robinhoodchain.blockscout.com/api/v2";
 
+// RETRA API (Cloudflare Worker). Local dev uses `npm run dev` in api/; production is filled in after deploy.
+const LOCAL = ["localhost", "127.0.0.1"].includes(location.hostname);
+export const API_URL = LOCAL ? "http://127.0.0.1:8787" : "";
+
 export const MAX_POSITIONS = 100; // read at most two Blockscout pages per address
 export const SESSION_HOURS = 24; // how long a wallet sign-in is remembered in this browser

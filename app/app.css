@@ -91,6 +91,55 @@
 .skel { height: 260px; border-radius: var(--radius); border: 1px solid var(--line); background: linear-gradient(90deg, var(--surface) 0%, var(--surface-2) 50%, var(--surface) 100%); background-size: 200% 100%; animation: shimmer 1.4s linear infinite; }
 @keyframes shimmer { to { background-position: -200% 0; } }
 
+/* tabs */
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-top: 8px; }
+.tab { padding: 12px 16px; color: var(--muted); font-weight: 500; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color .2s, border-color .2s; }
+.tab:hover { color: var(--text); }
+.tab[aria-selected="true"] { color: var(--text); border-bottom-color: var(--callouts); }
+.view { display: grid; gap: 20px; }
+.view[hidden] { display: none; }
+
+/* feed */
+.feed__sub { margin-top: 6px; max-width: 60ch; font-size: 0.9375rem; }
+.feed { display: grid; gap: 12px; max-width: 760px; }
+.feed__more { justify-self: start; }
+.feed__more[hidden] { display: none; }
+.cc { display: grid; gap: 14px; padding: 20px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); min-width: 0; }
+.cc__head { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; }
+.cc__avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--surface-2); }
+.cc__who { display: grid; gap: 2px; min-width: 0; }
+.cc__who a { color: var(--text); font-weight: 500; }
+.cc__who a:hover { color: var(--callouts); }
+.cc__who .mono { font-size: 0.75rem; }
+.cc__text { font-size: 1.0625rem; line-height: 1.5; overflow-wrap: anywhere; white-space: pre-wrap; }
+.cc__pos { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; padding-top: 12px; border-top: 1px solid var(--line); }
+.cc__pos strong { font-size: 1rem; }
+.cc .pos__kv { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.cc--closed .rbar__range { background: var(--dim); }
+.cc--below .rbar__range, .cc--above .rbar__range { background: var(--warn); opacity: 0.55; }
+.skel--short { height: 220px; }
+
+/* post buttons on position cards */
+.btn--posted { color: var(--proof); border-color: rgba(68,224,160,.35); }
+
+/* composer dialog */
+.composer { width: min(560px, calc(100vw - 32px)); padding: 0; border: 1px solid var(--line-2); border-radius: 20px; background: var(--surface); color: var(--text); box-shadow: 0 40px 120px -30px rgba(0,0,0,.9); }
+.composer::backdrop { background: rgba(5,5,7,.72); backdrop-filter: blur(4px); }
+.composer form { display: grid; gap: 12px; padding: 22px; }
+.composer__head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.composer__head h2 { font-size: 1.25rem; }
+.composer__x { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--line-2); background: transparent; color: var(--muted); font-size: 1.25rem; line-height: 1; }
+.composer__x:hover { color: var(--text); }
+.composer__pos { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 12px 14px; border-radius: 12px; background: var(--bg-2); border: 1px solid var(--line); }
+.composer__pos strong { font-weight: 600; }
+.composer__text { height: auto; min-height: 110px; padding: 12px 14px; resize: vertical; font-family: var(--font); font-size: 1rem; line-height: 1.5; }
+.composer__meta { display: flex; justify-content: space-between; gap: 12px; font-size: 0.8125rem; }
+.composer__meta .mono { color: var(--muted); white-space: nowrap; }
+.composer__meta .mono.over { color: var(--fail); }
+.composer__err { color: var(--fail); font-size: 0.875rem; }
+.composer__err:empty { display: none; }
+.composer__foot { display: flex; justify-content: flex-end; gap: 8px; padding-top: 4px; }
+
 .app-footer { border-top: 1px solid var(--line); padding-block: 28px; }
 .app-footer__inner { display: grid; gap: 8px; }
 .app-footer a { color: var(--muted); font-size: 0.9rem; justify-self: start; }
@@ -102,4 +151,6 @@
   .app-main { padding-block: 32px 72px; }
   .stats { gap: 16px; }
   .grid { grid-template-columns: 1fr; }
+  .cc .pos__kv { grid-template-columns: 1fr 1fr; }
+  .cc { padding: 16px; }
 }
