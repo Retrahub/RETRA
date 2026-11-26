@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RETRA · Trade it. Tail it. Prove it.</title>
+  <meta name="description" content="RETRA brings session-aware stock-token markets, proof-backed LP callouts and verifiable research replication into one on-chain app on Robinhood Chain." />
+  <meta name="theme-color" content="#09090B" />
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- ============ NAV ============ -->
+  <header class="nav" id="top">
+    <div class="wrap nav__inner">
+      <a href="#top" class="brand" aria-label="RETRA home">
+        <img src="assets/logo.svg" alt="" width="28" height="28" />
+        <span>RETRA</span>
+      </a>
+      <nav class="nav__links" id="navLinks" aria-label="Main">
+        <a href="#markets"><i class="dot dot--markets"></i>Markets</a>
+        <a href="#callouts"><i class="dot dot--callouts"></i>Callouts</a>
+        <a href="#proof"><i class="dot dot--proof"></i>Proof</a>
+        <a href="#stack">How it fits</a>
+        <a href="#safety">Safety</a>
+        <a href="#token">Token</a>
+      </nav>
+      <div class="nav__cta">
+        <a href="#docs" class="btn btn--ghost btn--sm hide-sm">Docs</a>
+        <a href="#launch" class="btn btn--primary btn--sm">Launch app</a>
+        <button class="nav__toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
+          <span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ HERO ============ -->
+    <section class="hero">
+      <div class="hero__grid-bg" aria-hidden="true"></div>
+      <div class="wrap hero__inner">
+        <div class="hero__copy">
+          <div class="chips">
+            <span class="chip"><i class="pulse"></i>Robinhood Chain · Mainnet</span>
+            <button class="chip chip--btn" id="copyCa" data-ca="0x0000000000000000000000000000000000000000" title="Copy contract address">
+              <span class="mono">CA</span>
+              <span class="mono" id="caText">0x0000…0000 · TBA</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+            </button>
+          </div>
+
+          <h1 class="hero__title">
+            <span class="w w--markets">Trade it.</span>
+            <span class="w w--callouts">Tail it.</span>
+            <span class="w w--proof"><em>Prove it.</em></span>
+          </h1>
+
+          <p class="hero__lead">
+            RETRA is one on-chain app for three things that used to live apart:
+            <strong>stock-token pools</strong> that follow market hours,
+            <strong>LP positions</strong> you can post and copy in one tap, and
+            <strong>research claims</strong> re-run until they are proven.
+          </p>
+
+          <div class="hero__actions">
+            <a href="#launch" class="btn btn--primary">Launch app
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+            <a href="#modules" class="btn btn--ghost">Explore the modules</a>
+          </div>
+
+          <dl class="hero__stats">
+            <div><dt>Modules</dt><dd>3</dd></div>
+            <div><dt>Settlement</dt><dd>USDG</dd></div>
+            <div><dt>Custody</dt><dd>Yours</dd></div>
+          </dl>
+        </div>
+
+        <!-- Live composite console -->
+        <div class="console" aria-label="RETRA live preview">
+          <div class="console__bar">
+            <span class="console__dots"><i></i><i></i><i></i></span>
+            <span class="mono">retra://overview</span>
+            <span class="mono console__time" id="nyClock">--:-- ET</span>
+          </div>
+
+          <div class="console__row">
+            <div class="console__label"><i class="dot dot--markets"></i>Markets · session</div>
+            <div class="console__session">
+              <strong id="heroSession">Detecting…</strong>
+              <span class="mono" id="heroFee">base fee —</span>
+            </div>
+          </div>
+
+          <div class="console__chart">
+            <canvas id="binsCanvas" aria-hidden="true"></canvas>
+            <div class="console__chart-legend mono">
+              <span><i class="sw sw--below"></i>below spot</span>
+              <span><i class="sw sw--active"></i>active bin</span>
+              <span><i class="sw sw--above"></i>above spot</span>
+            </div>
+          </div>
+
+          <div class="console__row">
+            <div class="console__label"><i class="dot dot--callouts"></i>Callouts · latest</div>
+            <div class="console__feed mono" id="heroFeed">@caller · CURVE · 14 bins · IN RANGE</div>
+          </div>
+
+          <div class="console__row console__row--last">
+            <div class="console__label"><i class="dot dot--proof"></i>Proof · claim</div>
+            <div class="console__proof mono">
+              <span>table_2.auroc</span>
+              <span class="muted">0.912 → 0.909</span>
+              <span class="tag tag--proof">Replicated</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee__track">
+          <span>Robinhood Chain</span><span>Uniswap v4 hooks</span><span>DLMM v2 bins</span><span>Market sessions</span><span>Proof-backed callouts</span><span>GPU TEE attestation</span><span>USDG bounties</span><span>Canonical indexer</span><span>Open source</span>
+          <span>Robinhood Chain</span><span>Uniswap v4 hooks</span><span>DLMM v2 bins</span><span>Market sessions</span><span>Proof-backed callouts</span><span>GPU TEE attestation</span><span>USDG bounties</span><span>Canonical indexer</span><span>Open source</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ MODULES OVERVIEW ============ -->
+    <section class="section" id="modules">
+      <div class="wrap">
+        <header class="section__head reveal">
+          <p class="eyebrow">One app · three modules</p>
+          <h2>Everything you do on RETRA <em>leaves a proof.</em></h2>
+          <p class="section__sub">Trading, sharing a strategy and checking a paper all run on the same rails: one identity, one settlement asset, one rule — every number comes from chain or from a signed run.</p>
+        </header>
+
+        <div class="modules">
+          <a href="#markets" class="module module--markets reveal">
+            <div class="module__top"><span class="mono">01</span><span class="tag tag--markets">Markets</span></div>
+            <h3>Stock tokens, priced by the clock.</h3>
+            <p>Pools for tokenized stocks where fees and flow limits follow the exchange session — cheapest in regular hours, bounded when the market is closed.</p>
+            <ul>
+              <li>Session-aware LP fees</li>
+              <li>Per-swap and rolling flow caps</li>
+              <li>Liquidity as a transferable NFT</li>
+            </ul>
+            <span class="module__link">Open Markets →</span>
+          </a>
+
+          <a href="#callouts" class="module module--callouts reveal">
+            <div class="module__top"><span class="mono">02</span><span class="tag tag--callouts">Callouts</span></div>
+            <h3>Every LP position is a post.</h3>
+            <p>Open a concentrated range, publish it as a callout, and let anyone tail the exact bins in one tap. No screenshots, no trust — just the position.</p>
+            <ul>
+              <li>Bound to one on-chain position</li>
+              <li>Anti-shill badges from chain data</li>
+              <li>Tailers always sign their own tx</li>
+            </ul>
+            <span class="module__link">Open Callouts →</span>
+          </a>
+
+          <a href="#proof" class="module module--proof reveal">
+            <div class="module__top"><span class="mono">03</span><span class="tag tag--proof">Proof</span></div>
+            <h3>Science, re-run and verified.</h3>
+            <p>Fund a USDG bounty on any paper with public code and data. It is re-run on attested GPUs and confirmed by a second node before a verdict is published.</p>
+            <ul>
+              <li>Four verdicts per claim</li>
+              <li>Two matching runs, one certificate</li>
+              <li>Pays the same on any verdict</li>
+            </ul>
+            <span class="module__link">Open Proof →</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ MARKETS ============ -->
+    <section class="section section--markets" id="markets">
+      <div class="wrap">
+        <header class="section__head reveal">
+          <p class="eyebrow eyebrow--markets">Module 01 · Markets</p>
+          <h2>A market with a clock. <em>A rule for every hour.</em></h2>
+          <p class="section__sub">RETRA Markets lists pools for tokenized stocks like AAPL, NVDA and TSLA. A Uniswap v4 hook reads the exchange session before every swap and sets the fee and flow limits to match.</p>
+        </header>
+
+        <div class="split">
+          <!-- Session switcher -->
+          <div class="panel reveal">
+            <div class="panel__head">
+              <span class="mono">Session policy</span>
+              <span class="mono live" id="sessionLive"><i class="pulse pulse--markets"></i>Live · New York</span>
+            </div>
+
+            <div class="timeline" aria-hidden="true">
+              <div class="timeline__bar">
+                <span class="seg seg--overnight" style="--from:0;--to:4"></span>
+                <span class="seg seg--pre" style="--from:4;--to:9.5"></span>
+                <span class="seg seg--regular" style="--from:9.5;--to:16"></span>
+                <span class="seg seg--post" style="--from:16;--to:20"></span>
+                <span class="seg seg--overnight" style="--from:20;--to:24"></span>
+                <span class="timeline__now" id="timelineNow"></span>
+              </div>
+              <div class="timeline__ticks mono"><span>00</span><span>04</span><span>09:30</span><span>16</span><span>20</span><span>24</span></div>
+            </div>
+
+            <div class="sessions" role="tablist" aria-label="Market sessions">
+              <button role="tab" class="session" data-session="pre">Pre-market</button>
+              <button role="tab" class="session" data-session="regular">Regular</button>
+              <button role="tab" class="session" data-session="post">After-hours</button>
+              <button role="tab" class="session" data-session="overnight">Overnight</button>
+              <button role="tab" class="session" data-session="closed">Closed</button>
+            </div>
+
+            <div class="session-detail" id="sessionDetail" aria-live="polite">
+              <div class="session-detail__fee">
+                <span class="mono muted">Base LP fee</span>
+                <strong id="sdFee">0.05%</strong>
+              </div>
+              <div class="feebar"><span id="sdFeeBar"></span></div>
+              <dl class="kv">
+                <div><dt>Flow limits</dt><dd id="sdFlow">Standard</dd></div>
+                <div><dt>Pricing</dt><dd id="sdPrice">Live external check</dd></div>
+                <div><dt>Data</dt><dd id="sdData">Verified regular-hours feed</dd></div>
+              </dl>
+              <p class="session-detail__note" id="sdNote">Deepest liquidity, cheapest fee, standard limits.</p>
+            </div>
+          </div>
+
+          <!-- Four checks -->
+          <div class="reveal">
+            <h3 class="sub-title">One swap, four checks.</h3>
+            <p class="muted">Every trade passes the same gate in one transaction. If any check fails, the swap is refused on-chain — nothing is guessed.</p>
+            <ol class="checks">
+              <li>
+                <span class="checks__n mono">01</span>
+                <div><strong>Read the market</strong><p>Exchange calendar, stock identity and feed freshness must describe the same supported session.</p></div>
+                <span class="tag tag--ok">Fresh</span>
+              </li>
+              <li>
+                <span class="checks__n mono">02</span>
+                <div><strong>Price the session</strong><p>The verified session selects the base LP fee — thinner hours pay more.</p></div>
+                <span class="tag tag--ok">0.05%</span>
+              </li>
+              <li>
+                <span class="checks__n mono">03</span>
+                <div><strong>Bound the flow</strong><p>A per-swap cap plus a rolling gross-flow window. Deposits and midnight do not reset it.</p></div>
+                <span class="tag tag--ok">Within</span>
+              </li>
+              <li>
+                <span class="checks__n mono">04</span>
+                <div><strong>Execute or stop</strong><p>Fee and guards apply atomically at the hook. LP withdrawals are never blocked.</p></div>
+                <span class="tag tag--markets">Execute</span>
+              </li>
+            </ol>
+          </div>
+        </div>
+
+        <!-- Opening auction -->
+        <div class="auction reveal">
+          <div class="auction__copy">
+            <p class="eyebrow eyebrow--markets">Opening auction</p>
+            <h3 class="sub-title">One fair price at the open.</h3>
+            <p class="muted">After a close, orders collect in escrow for ten minutes. At the open the contract picks the single price that matches the most volume. Anything unmatched goes back to its owner in full.</p>
+            <dl class="auction__stats">
+              <div><dt>Order window</dt><dd>10 min</dd></div>
+              <div><dt>Orders per cycle</dt><dd>25</dd></div>
+              <div><dt>Auction fee</dt><dd>0</dd></div>
+            </dl>
+          </div>
+          <div class="book" aria-label="Example order book clearing at 349.00 USDG">
+            <div class="book__head mono"><span>Example book · AAPL / USDG</span><span class="tag tag--markets">Clears 349.00</span></div>
+            <div class="book__bars" id="bookBars"></div>
+            <div class="book__axis mono"><span>340</span><span>345</span><span>350</span><span>355</span></div>
+            <div class="book__legend mono"><span><i class="sw sw--buy"></i>buy</span><span><i class="sw sw--sell"></i>sell</span><span><i class="sw sw--clear"></i>clearing price</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CALLOUTS ============ -->
+    <section class="section section--callouts" id="callouts">
+      <div class="wrap">
+        <header class="section__head reveal">
+          <p class="eyebrow eyebrow--callouts">Module 02 · Callouts</p>
+          <h2>Strategies used to travel as screenshots. <em>Here the strategy is the post.</em></h2>
+          <p class="section__sub">A callout is tied to one real position owned by the poster. Every number on the card is read from chain, and anyone can copy the range — sized and signed by themselves.</p>
+        </header>
+
+        <div class="split split--callouts">
+          <!-- Callout card -->
+          <article class="callout reveal" aria-label="Example callout">
+            <header class="callout__head">
+              <div class="avatar" aria-hidden="true">C</div>
+              <div>
+                <strong>@caller</strong>
+                <span class="mono muted">AAPL / USDG · 4m ago</span>
+              </div>
+              <span class="tag tag--callouts">On chain</span>
+            </header>
+            <p class="callout__text">Buying the dip into the curve. Range sits under spot — filling as it drifts down.</p>
+
+            <div class="callout__bins">
+              <canvas id="calloutCanvas" aria-hidden="true"></canvas>
+            </div>
+
+            <dl class="callout__meta">
+              <div><dt>Shape</dt><dd>Curve · 14 bins</dd></div>
+              <div><dt>Range</dt><dd>Below active bin</dd></div>
+              <div><dt>Status</dt><dd class="ok">In range 82% of 3h</dd></div>
+            </dl>
+
+            <div class="callout__badges">
+              <span class="badge">Range honesty · 82%</span>
+              <span class="badge">Held 4m · no exits</span>
+            </div>
+
+            <div class="tailbar">
+              <div class="seg-toggle" role="tablist" aria-label="Tail mode">
+                <button role="tab" class="is-active" data-tail="exact" aria-selected="true">Same bins</button>
+                <button role="tab" data-tail="shape" aria-selected="false">Same shape now</button>
+              </div>
+              <button class="btn btn--callouts btn--sm" id="tailBtn">Tail</button>
+            </div>
+            <p class="callout__fine mono" id="tailNote">Prefills the caller's 14 bins. You choose the size and sign.</p>
+          </article>
+
+          <!-- Flow + integrity -->
+          <div class="reveal">
+            <h3 class="sub-title">From seeing a range to holding it.</h3>
+            <ol class="flow">
+              <li><span class="flow__n">1</span><div><strong>Sign in with X</strong><p>Identity only — handle and avatar. RETRA can never post for you.</p></div></li>
+              <li><span class="flow__n">2</span><div><strong>Link a wallet</strong><p>One EIP-191 signature, up to three wallets.</p></div></li>
+              <li><span class="flow__n">3</span><div><strong>Open a position</strong><p>Pick spot, curve or bid-ask bins in one transaction.</p></div></li>
+              <li><span class="flow__n">4</span><div><strong>Post the callout</strong><p>Your words, 280 characters. Goes live when the tx confirms.</p></div></li>
+              <li><span class="flow__n">5</span><div><strong>Anyone tails</strong><p>Exact bins, or the same shape re-anchored to the active bin.</p></div></li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="integrity reveal">
+          <div class="integrity__head">
+            <h3 class="sub-title">Anti-shill is built in, not bolted on.</h3>
+            <p class="muted">Badges are computed server-side from chain data. Deleting a callout cannot hide a bad call.</p>
+          </div>
+          <div class="badges-grid">
+            <div class="bcard"><span class="badge badge--warn">Quick exit</span><p>Caller removes half or more within 30 minutes of posting. Excluded from Best.</p></div>
+            <div class="bcard"><span class="badge badge--warn">Opposite side</span><p>Caller holds liquidity on the other side of the call they are pushing.</p></div>
+            <div class="bcard"><span class="badge badge--warn">Dev or team</span><p>Caller wallet deployed the token or is a top-10 holder.</p></div>
+            <div class="bcard"><span class="badge">Fresh wallet</span><p>Linked wallet is younger than seven days.</p></div>
+            <div class="bcard"><span class="badge">Range honesty</span><p>Share of time in range since the post, always on the card.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PROOF ============ -->
+    <section class="section section--proof" id="proof">
+      <div class="wrap">
+        <header class="section__head reveal">
+          <p class="eyebrow eyebrow--proof">Module 03 · Proof</p>
+          <h2>One run is a claim. <em>Two matching runs are a verdict.</em></h2>
+          <p class="section__sub">RETRA Proof is a replication market. Post a paper and a USDG bounty, and its results are re-run on attested GPUs, then confirmed by an independent node before anything is published.</p>
+        </header>
+
+        <div class="split">
+          <!-- Terminal -->
+          <div class="terminal reveal" aria-label="Example paper intake">
+            <div class="terminal__bar">
+              <span class="console__dots"><i></i><i></i><i></i></span>
+              <span class="mono">retra-proof intake</span>
+            </div>
+            <pre class="terminal__body mono" id="terminal"></pre>
+          </div>
+
+          <!-- Verdicts -->
+          <div class="reveal">
+            <h3 class="sub-title">Every claim gets its own verdict.</h3>
+            <p class="muted">The paper's value next to the re-run value, judged against the tolerance written in the manifest. Example values below.</p>
+
+            <div class="verdicts" role="tablist" aria-label="Verdicts">
+              <button role="tab" class="verdict is-active" data-v="replicated" aria-selected="true"><i class="vdot vdot--ok"></i>Replicated</button>
+              <button role="tab" class="verdict" data-v="partial" aria-selected="false"><i class="vdot vdot--partial"></i>Partial</button>
+              <button role="tab" class="verdict" data-v="failed" aria-selected="false"><i class="vdot vdot--fail"></i>Failed</button>
+              <button role="tab" class="verdict" data-v="norun" aria-selected="false"><i class="vdot vdot--none"></i>Could not run</button>
+            </div>
+
+            <div class="vcard" aria-live="polite">
+              <div class="vcard__row"><span class="mono muted">claim</span><span class="mono" id="vClaim">table_2.auroc</span></div>
+              <div class="vcard__row"><span class="mono muted">paper</span><span class="mono" id="vPaper">0.912</span></div>
+              <div class="vcard__row"><span class="mono muted">re-run</span><span class="mono" id="vRerun">0.909</span></div>
+              <div class="vcard__row"><span class="mono muted">tolerance</span><span class="mono" id="vTol">± 0.005</span></div>
+              <div class="vcard__row"><span class="mono muted">nodes</span><span class="mono" id="vNodes">2 of 2 agree</span></div>
+              <p class="vcard__note" id="vNote">Inside the tolerance written in the manifest.</p>
+            </div>
+            <p class="fine">"Failed" means not reproduced with the published code and data. It never means fraud.</p>
+          </div>
+        </div>
+
+        <!-- Pipeline -->
+        <div class="pipeline reveal">
+          <h3 class="sub-title">From DOI to certificate, without trusting anyone.</h3>
+          <ol class="pipeline__steps">
+            <li><span class="mono">01</span><strong>Bounty</strong><p>Paper, claims to check and a USDG bounty held in escrow.</p></li>
+            <li><span class="mono">02</span><strong>Manifest</strong><p>Code commit, data hashes, seeds and tolerances pinned.</p></li>
+            <li><span class="mono">03</span><strong>Execute</strong><p>Runs inside a GPU TEE that signs container, inputs and outputs.</p></li>
+            <li><span class="mono">04</span><strong>Confirm</strong><p>A second, independent node re-runs it and must match.</p></li>
+            <li><span class="mono">05</span><strong>Anchor</strong><p>Verdict per claim written to a contract on Robinhood Chain.</p></li>
+            <li><span class="mono">06</span><strong>Publish</strong><p>Certificate with evidence by hash. Verify it in your browser.</p></li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ HOW IT FITS ============ -->
+    <section class="section" id="stack">
+      <div class="wrap">
+        <header class="section__head reveal">
+          <p class="eyebrow">How it fits together</p>
+          <h2>Three modules. <em>One set of rails.</em></h2>
+          <p class="section__sub">Each module does one job well. Underneath, they share identity, settlement, indexing and verification — so you sign in once and every result is checkable the same way.</p>
+        </header>
+
+        <div class="stack reveal">
+          <div class="stack__loop">
+            <svg viewBox="0 0 420 380" role="img" aria-labelledby="loopTitle">
+              <title id="loopTitle">The RETRA loop: Proof verifies research, Markets trades the assets, Callouts spreads strategies</title>
+              <defs>
+                <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0 0L10 5L0 10z" fill="var(--muted)" />
+                </marker>
+              </defs>
+              <path class="loop-path" d="M254 86 C 320 104, 362 170, 349 228" marker-end="url(#arrow)" />
+              <path class="loop-path" d="M312 320 C 262 368, 162 368, 112 324" marker-end="url(#arrow)" />
+              <path class="loop-path" d="M72 236 C 56 168, 98 104, 160 88" marker-end="url(#arrow)" />
+
+              <g class="loop-node loop-node--proof">
+                <circle cx="210" cy="70" r="46" />
+                <text x="210" y="66" text-anchor="middle" class="loop-t">Proof</text>
+                <text x="210" y="84" text-anchor="middle" class="loop-s">verifies</text>
+              </g>
+              <g class="loop-node loop-node--markets">
+                <circle cx="340" cy="282" r="46" />
+                <text x="340" y="278" text-anchor="middle" class="loop-t">Markets</text>
+                <text x="340" y="296" text-anchor="middle" class="loop-s">prices</text>
+              </g>
+              <g class="loop-node loop-node--callouts">
+                <circle cx="80" cy="282" r="46" />
+                <text x="80" y="278" text-anchor="middle" class="loop-t">Callouts</text>
+                <text x="80" y="296" text-anchor="middle" class="loop-s">spreads</text>
+              </g>
+              <text x="210" y="214" text-anchor="middle" class="loop-core">RETRA</text>
+              <text x="210" y="236" text-anchor="middle" class="loop-s">one account · USDG</text>
+            </svg>
+          </div>
+
+          <div class="layers">
+            <div class="layer"><span class="mono layer__n">L1</span><div><strong>Identity</strong><p>Sign in with X (read-only scope) and link up to three wallets with one signature each.</p></div></div>
+            <div class="layer"><span class="mono layer__n">L2</span><div><strong>Settlement</strong><p>USDG on Robinhood Chain for swaps, auctions and bounties. Exact approvals only.</p></div></div>
+            <div class="layer"><span class="mono layer__n">L3</span><div><strong>Canonical indexer</strong><p>Reads verified on-chain events for feeds, badges and pool state. Never holds funds.</p></div></div>
+            <div class="layer"><span class="mono layer__n">L4</span><div><strong>Verification</strong><p>Open-source verifier, attestation checked against vendor services, hashes checked in your browser.</p></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SAFETY ============ -->
+    <section class="section" id="safety">
+      <div class="wrap">
+        <header class="section__head reveal">
+          <p class="eyebrow">Safety</p>
+          <h2>Your keys. Your range. <em>Your signature.</em></h2>
+        </header>
+        <div class="safety">
+          <div class="scard reveal"><span class="mono">01</span><strong>No admin key moves funds</strong><p>Treasury and upgrades sit behind a Safe and a timelock, with per-pool caps.</p></div>
+          <div class="scard reveal"><span class="mono">02</span><strong>Exact approvals</strong><p>Every deposit approves the amount you typed — never unlimited.</p></div>
+          <div class="scard reveal"><span class="mono">03</span><strong>Nothing auto-executes</strong><p>Tailing and quotes only prefill. You review, size and sign every transaction.</p></div>
+          <div class="scard reveal"><span class="mono">04</span><strong>Limits live on-chain</strong><p>Fees, flow caps and closure budgets are enforced by the hook and cannot be bypassed.</p></div>
+          <div class="scard reveal"><span class="mono">05</span><strong>X is read only</strong><p>We read your handle, name and avatar. We cannot post, like or DM.</p></div>
+          <div class="scard reveal"><span class="mono">06</span><strong>Paid on any verdict</strong><p>Proof bounties pay the same whatever the result, so nobody is paid to say yes.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ STATUS ============ -->
+    <section class="section" id="status">
+      <div class="wrap">
+        <header class="section__head reveal">
+          <p class="eyebrow">Status</p>
+          <h2>What works today, <em>and what is next.</em></h2>
+        </header>
+        <div class="status reveal">
+          <div class="status__col">
+            <h3 class="status__h"><i class="pulse pulse--proof"></i>Live</h3>
+            <ul>
+              <li><span class="tag tag--markets">Markets</span>Create, seed and swap stock-token pools</li>
+              <li><span class="tag tag--markets">Markets</span>Opening auction for USDG / stock pools</li>
+              <li><span class="tag tag--callouts">Callouts</span>Post a position and tail it in one tap</li>
+              <li><span class="tag tag--callouts">Callouts</span>Anti-shill badges on every card</li>
+              <li><span class="tag tag--proof">Proof</span>Paper intake and readiness checks</li>
+              <li><span class="tag tag--proof">Proof</span>USDG bounties with on-chain escrow</li>
+            </ul>
+          </div>
+          <div class="status__col status__col--next">
+            <h3 class="status__h"><i class="ring"></i>In progress</h3>
+            <ul>
+              <li><span class="tag tag--proof">Proof</span>GPU TEE runs and attestation</li>
+              <li><span class="tag tag--proof">Proof</span>Second-node confirmation and on-chain certificates</li>
+              <li><span class="tag">Core</span>One portfolio view across all three modules</li>
+              <li><span class="tag">Core</span>Third-party audit of contracts and verifier</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ TOKEN ============ -->
+    <section class="section" id="token">
+      <div class="wrap">
+        <div class="token reveal">
+          <div class="token__copy">
+            <p class="eyebrow">Token</p>
+            <h2>$RETRA</h2>
+            <p class="section__sub">One token across all three modules. Holding unlocks tiers — nothing is printed.</p>
+            <div class="token__ca">
+              <span class="mono muted">Contract · Robinhood Chain</span>
+              <span class="mono">To be announced</span>
+            </div>
+          </div>
+          <div class="token__grid">
+            <div class="tcard"><strong>Fair launch</strong><p>Fixed supply, no presale, no owner functions.</p></div>
+            <div class="tcard"><strong>No staking, no emissions</strong><p>Holding unlocks tiers. Supply never grows.</p></div>
+            <div class="tcard"><strong>Holder tiers</strong><p>Lower bounty fees, free research runs, feed priority and larger jobs.</p></div>
+            <div class="tcard"><strong>Verification is free</strong><p>Reading a certificate or a callout never needs the token.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CTA ============ -->
+    <section class="cta" id="launch">
+      <div class="wrap cta__inner reveal">
+        <h2>Trade it. Tail it. <em>Prove it.</em></h2>
+        <p>Browse with a wallet. Posting, liking and funding bounties need a quick sign-in.</p>
+        <div class="hero__actions hero__actions--center">
+          <a href="#launch" class="btn btn--primary">Launch app</a>
+          <a href="#docs" class="btn btn--ghost">Read the docs</a>
+        </div>
+        <p class="fine">LP positions can lose value. Tailing copies a range, not a result. Nothing on this site is financial advice.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer" id="docs">
+    <div class="wrap footer__grid">
+      <div class="footer__brand">
+        <a href="#top" class="brand"><img src="assets/logo.svg" alt="" width="28" height="28" /><span>RETRA</span></a>
+        <p class="muted">Trade it. Tail it. Prove it.<br />Built on Robinhood Chain.</p>
+      </div>
+      <div><h4>Modules</h4><a href="#markets">Markets</a><a href="#callouts">Callouts</a><a href="#proof">Proof</a></div>
+      <div><h4>Developers</h4><a href="#docs">Docs</a><a href="#docs">Contracts</a><a href="#docs">API &amp; MCP</a><a href="#docs">GitHub</a></div>
+      <div><h4>Project</h4><a href="#token">$RETRA</a><a href="#safety">Safety</a><a href="#status">Status</a><a href="#docs">Brand</a></div>
+    </div>
+    <div class="wrap footer__bottom mono">
+      <span>© <span id="year">2026</span> RETRA</span>
+      <span>Robinhood Chain · USDG</span>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="script.js"></script>
+</body>
+</html>
