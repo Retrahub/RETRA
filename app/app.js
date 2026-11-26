@@ -8,6 +8,7 @@ import {
   createPublicClient,
   defineChain,
   encodeAbiParameters,
+  fallback,
   getAddress,
   http,
   isAddress,
@@ -318,7 +319,10 @@ const chain = defineChain({
   blockExplorers: { default: { name: "Blockscout", url: CHAIN.explorer } },
   contracts: { multicall3: { address: CONTRACTS.multicall3 } },
 });
-const client = createPublicClient({ chain, transport: http(CHAIN.rpc, { timeout: 20000, retryCount: 2 }) });
+const client = createPublicClient({
+  chain,
+  transport: fallback([CHAIN.rpc, CHAIN.rpcFallback].filter(Boolean).map((u) => http(u, { timeout: 20000, retryCount: 1 }))),
+});
 
 const pmAbi = parseAbi([
   "function getPoolAndPositionInfo(uint256 tokenId) view returns ((address currency0, address currency1, uint24 fee, int24 tickSpacing, address hooks) poolKey, uint256 info)",

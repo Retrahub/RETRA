@@ -7,6 +7,8 @@ export const CHAIN = {
   name: "Robinhood Chain",
   // Public RPC: free but rate-limited. Swap for a paid provider when traffic grows.
   rpc: "https://rpc.mainnet.chain.robinhood.com",
+  // Free keyless dRPC endpoint, used when the official RPC is busy.
+  rpcFallback: "https://robinhood.drpc.org",
   explorer: "https://robinhoodchain.blockscout.com",
   nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
 };
@@ -21,9 +23,9 @@ export const CONTRACTS = {
 // Blockscout lists which position NFTs an address holds (the PositionManager is not enumerable on-chain).
 export const BLOCKSCOUT_API = "https://robinhoodchain.blockscout.com/api/v2";
 
-// RETRA API (Cloudflare Worker). Local dev uses `npm run dev` in api/; production is filled in after deploy.
+// RETRA API (Cloudflare Worker). Local dev uses `npm run dev` in api/.
 const LOCAL = ["localhost", "127.0.0.1"].includes(location.hostname);
-export const API_URL = LOCAL ? "http://127.0.0.1:8787" : "";
+export const API_URL = LOCAL ? "http://127.0.0.1:8787" : "https://retra-api.retra-api.workers.dev";
 
 export const MAX_POSITIONS = 100; // read at most two Blockscout pages per address
 export const SESSION_HOURS = 24; // how long a wallet sign-in is remembered in this browser

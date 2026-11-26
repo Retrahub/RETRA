@@ -16,6 +16,7 @@ import {
   createPublicClient,
   defineChain,
   encodeAbiParameters,
+  fallback,
   getAddress,
   http,
   isAddress,
@@ -75,6 +76,11 @@ const poolIdOf = (k) =>
     )
   );
 
+function isRevert(err) {
+  for (let e = err; e; e = e.cause) if (e.name === "ContractFunctionRevertedError") return true;
+  return false;
+}
+
 async function readJson(req) {
   try {
     return await req.json();
@@ -117,7 +123,11 @@ function chainClient(env) {
       rpcUrls: { default: { http: [env.RPC_URL] } },
       contracts: { multicall3: { address: MULTICALL3 } },
     });
-    cachedClient = createPublicClient({ chain, transport: http(env.RPC_URL, { timeout: 15000, retryCount: 2 }) });
+    const urls = [env.RPC_URL, env.RPC_FALLBACK_URL].filter(Boolean);
+    cachedClient = createPublicClient({
+      chain,
+      transport: fallback(urls.map((u) => http(u, { timeout: 15000, retryCount: 1 }))),
+    });
   }
   return cachedClient;
 }
@@ -278,7 +288,13 @@ async function postCallout(req, env, url) {
       { address: PM, abi: pmAbi, functionName: "getPositionLiquidity", args: [id] },
     ],
   });
-  if (owner.status !== "success" || info.status !== "success") {
+  const failed = [owner, info].find((r) => r.status !== "success");
+  if (failed) {
+    // A revert means the token id doesn't exist; anything else means the chain couldn't be reached.
+    if (!isRevert(failed.error)) {
+      console.error("RPC failure while checking position", tokenId, failed.error?.shortMessage || failed.error?.message);
+      throw new HttpError(502, "chain_unavailable", "Couldn't reach Robinhood Chain right now. Try again in a minute.");
+    }
     throw new HttpError(404, "no_position", "That position doesn't exist on Robinhood Chain.");
   }
   const devBypass =

@@ -5,10 +5,13 @@ compatibility_date = "2026-10-01"
 [vars]
 # Sites allowed to call the API (CORS) and to appear as the sign-in domain.
 ALLOWED_ORIGINS = "https://retrahub.github.io,http://localhost:5173"
-RPC_URL = "https://rpc.mainnet.chain.robinhood.com"
+# Robinhood's own public RPC rate-limits Cloudflare's shared IPs (HTTP 429), so the Worker uses dRPC's
+# free public endpoint first and falls back to the official RPC.
+RPC_URL = "https://robinhood.drpc.org"
+RPC_FALLBACK_URL = "https://rpc.mainnet.chain.robinhood.com"
 
 [[d1_databases]]
 binding = "DB"
 database_name = "retra"
-# Replaced with the real id after `npx wrangler d1 create retra`.
-database_id = "00000000-0000-0000-0000-000000000000"
+# Created with `npx wrangler d1 create retra` (region APAC).
+database_id = "869101cf-f14e-4ae2-b8e9-8ef1fc21ae1c"
