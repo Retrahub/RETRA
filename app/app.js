@@ -17,7 +17,7 @@ import {
   stringToHex,
   verifyMessage,
 } from "https://cdn.jsdelivr.net/npm/viem@2.39.3/+esm";
-import { API_URL, BLOCKSCOUT_API, CHAIN, CONTRACTS, MAX_POSITIONS, SESSION_HOURS } from "./chain.js";
+import { API_URL, BLOCKSCOUT_API, CHAIN, CONTRACTS, MAX_POSITIONS, SESSION_HOURS } from "./chain.js?v=4";
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
